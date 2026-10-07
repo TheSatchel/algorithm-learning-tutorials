@@ -25,14 +25,14 @@
 <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
 <aside class="sidebar" id="directory" aria-label="教程目录">
   <button class="sidebar-close" id="menu-close" aria-label="关闭目录">×</button>
-  <a class="site-brand" href="#arrays/2d/transform-0">算法映像<small>ALGOVISTA</small></a>
+  <a class="site-brand" href="#arrays/2d/rotate">算法映像<small>ALGOVISTA</small></a>
   <div class="directory-label">学习目录 / EXPLORE</div>
   <nav aria-label="按算法分类">
     <details open><summary>数组</summary><div class="subtree">
       <details><summary>一维数组</summary><p class="empty-directory">暂无教程</p></details>
       <details open><summary>二维数组</summary>
-        <a class="lesson-link" data-lesson="0" href="#arrays/2d/transform-0" aria-current="page">方块转换 · 0-base<span>P1205 · 从 0 开始</span></a>
-        <a class="lesson-link" data-lesson="1" href="#arrays/2d/transform-1">方块转换 · 1-base<span>P1205 · 从 1 开始</span></a>
+        <a class="lesson-link" data-topic="rotate" href="#arrays/2d/rotate" aria-current="page">顺时针旋转 90°<span>P1205 · 列变成行</span></a>
+        <a class="lesson-link" data-topic="mirror" href="#arrays/2d/mirror">左右镜像<span>P1205 · 行内倒序</span></a>
       </details>
     </div></details>
     <details><summary>搜索</summary><div class="subtree"><p class="empty-directory">暂无教程</p></div></details>
@@ -43,13 +43,13 @@
 <main class="page">
   <header class="top">
     <button class="menu-toggle" id="menu-toggle" aria-controls="directory" aria-expanded="false">☰ 目录</button>
-    <div class="breadcrumb">数组 / 二维数组 / <strong>方块转换</strong></div>
+    <div class="breadcrumb">数组 / 二维数组 / <strong id="topic-name">顺时针旋转 90°</strong></div>
     <div class="header-controls">
+      <span class="breadcrumb" style="align-self:center">下标起点</span>
       <div class="mode basis" aria-label="下标起点"><button data-base="0" aria-pressed="true">0-base</button><button data-base="1" aria-pressed="false">1-base</button></div>
-      <div class="mode" aria-label="变换类型"><button data-mode="rotate" aria-pressed="true">顺时针 90°</button><button data-mode="mirror" aria-pressed="false">左右镜像</button></div>
     </div>
   </header>
-  <section class="intro"><div class="eyebrow">P1205 · TRANSFORMATIONS</div><h1 id="heading">让一列，变成一行。</h1><p id="intro">先看图案怎样转，再看两个 for 怎样把这个动作写进数组。</p></section>
+  <section class="intro"><div class="eyebrow" id="topic-label">P1205 · CLOCKWISE ROTATION</div><h1 id="heading">让一列，变成一行。</h1><p id="intro">先看图案怎样转，再看两个 for 怎样把这个动作写进数组。</p></section>
   <div class="workspace">
     <section class="theatre" aria-label="变换动画">
       <div class="scene-head"><div class="chapters"><button data-view="geometry" aria-pressed="true"><b>01</b>看整体</button><button data-view="loop" aria-pressed="false"><b>02</b>看循环</button></div><span class="step" id="step">原图 → 新图</span></div>
@@ -76,8 +76,15 @@
   const canvas = $('scene'), ctx = canvas.getContext('2d');
   const original = ['A','B','C','D','E','F','G','H','I'];
   const colors = {text:'#e9edf3',muted:'#9aa8ba',line:'#354152',i:'#75d4ff',j:'#ffdb76',bg:'#101318'};
-  let mode = 'rotate', view = 'geometry', done = 0, active = 0;
-  let base = location.hash === '#arrays/2d/transform-1' ? 1 : 0;
+  function readRoute() {
+    const [path,query=''] = location.hash.slice(1).split('?');
+    return {mode:path==='arrays/2d/mirror'?'mirror':'rotate',base:path==='arrays/2d/transform-1'||new URLSearchParams(query).get('base')==='1'?1:0};
+  }
+  const initialRoute=readRoute();
+  let mode = initialRoute.mode, view = 'geometry', done = 0, active = 0;
+  let base = initialRoute.base;
+  const topicHash = (topic,indexBase) => `#arrays/2d/${topic}${indexBase===1?'?base=1':''}`;
+  history.replaceState(null,'',topicHash(mode,base));
   let progress = 0, geometryDone = false, playing = false, busy = false, run = 0;
   let fly = null, width = 0, height = 0, layout = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -187,9 +194,13 @@
     $('resolved').innerHTML=`<div class="small">n ${base?'+':'−'} 1 − j = 3 ${base?'+':'−'} 1 − ${j} = <span class="yellow">${2+2*base-j}</span></div>b[<span class="blue">${i}</span>][<span class="yellow">${j}</span>] ← a[${r}][${c}]<br><span class="small">本次取到：</span><span class="yellow">${letter}</span>`;
     $('index-note').innerHTML=base?'1-base：下标 1～n。开 <code>char a[4][4], b[4][4];</code>，灰色第 0 行 / 列留空，不参与循环。':'0-base：下标 0～n−1。开 <code>char a[3][3], b[3][3];</code>，每行、每列都参与循环。';
     $('index-footer').textContent=`下标从 ${base} 开始 · n = 3 · 格子只复制，不搬走`;
-    document.title=`方块转换 · ${base}-base · 算法映像 AlgoVista`;
-    document.querySelectorAll('[data-base]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.base)===base)));
-    document.querySelectorAll('[data-lesson]').forEach(a=>{if(Number(a.dataset.lesson)===base)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+    const topicName=mode==='rotate'?'顺时针旋转 90°':'左右镜像';
+    document.title=`${topicName} · ${base}-base · 算法映像 AlgoVista`;
+    $('topic-name').textContent=topicName;
+    $('topic-label').textContent=mode==='rotate'?'P1205 · CLOCKWISE ROTATION':'P1205 · HORIZONTAL REFLECTION';
+    $('intro').textContent=mode==='rotate'?'先看图案怎样转，再看两个 for 怎样把这个动作写进数组。':'先看每一行怎样左右翻转，再看两个 for 怎样按相反的列号取值。';
+    document.querySelectorAll('button[data-base]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.base)===base)));
+    document.querySelectorAll('[data-topic]').forEach(a=>{a.href=topicHash(a.dataset.topic,base);if(a.dataset.topic===mode)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
     $('heading').textContent=mode==='rotate'?'让一列，变成一行。':'让一行，左右倒过来。';
     $('step').textContent=view==='geometry'?'原图 → 新图':`已写入 ${done} / 9 格`;
     if(view==='geometry') {
@@ -202,9 +213,8 @@
     $('play').textContent=playing?'暂停':view==='geometry'?(busy?'继续播放':geometryDone?'再播一遍':mode==='rotate'?'播放旋转':'播放镜像'):(done===9?'从头播放':'自动执行');
     $('next').disabled=busy;$('next').textContent=view==='geometry'?'拆成循环':'下一格';
     $('reset').disabled=busy;
-    document.querySelectorAll('[data-mode]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.mode===mode));b.disabled=busy;});
     document.querySelectorAll('[data-view]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.view===view));b.disabled=busy;});
-    document.body.dataset.done=done;document.body.dataset.busy=String(busy);document.body.dataset.active=active;document.body.dataset.base=base;
+    document.body.dataset.done=done;document.body.dataset.busy=String(busy);document.body.dataset.active=active;document.body.dataset.base=base;document.body.dataset.currentTopic=mode;
   }
   async function animate(duration,frame,token) {
     if(reduced){frame(1);draw();return;}
@@ -235,12 +245,11 @@
   $('menu-close').addEventListener('click',()=>{setMenu(false);$('menu-toggle').focus();});
   $('menu-overlay').addEventListener('click',()=>setMenu(false));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){setMenu(false);if(matchMedia('(max-width: 740px)').matches)$('menu-toggle').focus();}});
-  document.querySelectorAll('[data-base]').forEach(b=>b.addEventListener('click',()=>{location.hash=`arrays/2d/transform-${b.dataset.base}`;}));
-  document.querySelectorAll('[data-lesson]').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
-  window.addEventListener('hashchange',()=>{base=location.hash==='#arrays/2d/transform-1'?1:0;reset();save();setMenu(false);});
+  document.querySelectorAll('button[data-base]').forEach(b=>b.addEventListener('click',()=>{location.hash=topicHash(mode,Number(b.dataset.base));}));
+  document.querySelectorAll('[data-topic]').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
+  window.addEventListener('hashchange',()=>{const route=readRoute();if(mode!==route.mode)view='geometry';mode=route.mode;base=route.base;reset();save();setMenu(false);});
   matchMedia('(max-width: 740px)').addEventListener('change',()=>setMenu(false));
   setMenu(false);
-  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;reset();save();}));
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;reset();save();}));
   $('play').addEventListener('click',()=>{
     if(view==='geometry'){if(busy){playing=!playing;ui();return;}animateGeometry();return;}

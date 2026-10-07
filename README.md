@@ -8,7 +8,7 @@ Interactive algorithm tutorials that connect visual intuition, array indices, an
 
 **Matrix transformations — Luogu P1205 / USACO Transformations**
 
-Located under **Arrays → Two-dimensional arrays**, with separate navigable **0-base** and **1-base** demonstrations. Index labels, formulas, loop bounds, and concrete array accesses update together. The 1-base demo shows the unused row and column at index 0.
+Located under **Arrays → Two-dimensional arrays**, with two separate topics: **Clockwise rotation (90°)** and **Horizontal reflection**. Choose **0-base** or **1-base** inside each topic. Index labels, formulas, loop bounds, and concrete array accesses update together. The 1-base demo shows the unused row and column at index 0.
 
 - Animated clockwise rotation and horizontal reflection.
 - Step-by-step copying from the original matrix into the destination matrix.
