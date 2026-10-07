@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="通过交互动画理解矩阵旋转、镜像、数组下标和 C++ 双重循环。">
-<title>看见下标 · 方块转换</title>
+<meta name="description" content="算法映像 AlgoVista：通过交互动画理解算法。探索二维数组、0-base 与 1-base 下标、矩阵转换和 C++ 循环。">
+<title>方块转换 · 算法映像 AlgoVista</title>
 <style>
 :root{color-scheme:dark;--bg:#101318;--panel:#171d25;--line:#29323f;--text:#e9edf3;--muted:#a2adbd;--i:#75d4ff;--j:#ffdb76;--green:#90e1b1}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"PingFang SC",sans-serif}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:2px solid var(--i);outline-offset:4px}button:disabled{cursor:default;opacity:.4}
@@ -14,11 +14,41 @@
 .controls{border-top:1px solid var(--line);padding-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.controls button{border:1px solid #354152;border-radius:7px;background:transparent;color:var(--text);padding:10px 14px}.controls .primary{background:var(--text);color:var(--bg);border-color:var(--text);min-width:100px}.speed{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.speed select{background:var(--bg);color:var(--text);border:1px solid var(--line);padding:7px;border-radius:6px}
 .code-panel{padding:23px 22px;background:var(--panel);border:1px solid var(--line);border-radius:12px}.code-label{font-size:12px;letter-spacing:.1em;color:var(--muted);margin-bottom:20px}.variables{display:flex;gap:18px;margin-bottom:24px}.variable{font-family:ui-monospace,SFMono-Regular,monospace;font-size:23px}.variable small{font-size:12px;color:var(--muted);display:block;margin-top:5px;font-family:system-ui}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:2.15;white-space:pre-wrap;overflow-wrap:anywhere}.code .dim{color:#8795a8}.code .active{background:#243240;border-radius:4px;display:inline-block;padding:0 5px;margin:0 -5px}.resolved{padding-top:18px;margin-top:18px;border-top:1px solid var(--line);font-family:ui-monospace,SFMono-Regular,monospace;font-size:15px;line-height:1.8}.resolved .small{font-size:12px;color:var(--muted)}.trace{margin-top:18px;color:var(--muted);font-size:13px;line-height:1.8;min-height:70px}.footer{display:flex;justify-content:space-between;gap:16px;margin-top:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}.footer code{color:var(--text)}
 @media(max-width:950px){.page{padding:24px}.workspace{grid-template-columns:minmax(0,1fr) 290px;gap:18px}.code-panel{padding:20px 16px}.code{font-size:11px}}@media(max-width:740px){.workspace{grid-template-columns:1fr}.intro{margin-top:26px}.code-panel{margin-top:4px}.footer{flex-direction:column}.speed{margin-left:0}}@media(max-width:400px){.page{padding:18px 14px}.top{align-items:flex-start;gap:10px}.brand{font-size:11px}.mode button{padding:7px 10px;font-size:12px}.chapters{gap:12px}.chapters button{font-size:13px}.controls button{padding:9px 10px}.caption{font-size:13px}.step{font-size:11px}}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1660px;margin:auto}.sidebar{position:sticky;top:0;height:100vh;padding:30px 20px;display:flex;flex-direction:column;border-right:1px solid var(--line);background:#12171e;overflow-y:auto}.site-brand{display:block;text-decoration:none;color:var(--text);font-size:23px;font-weight:500;letter-spacing:.04em}.site-brand small{display:block;font-size:11px;letter-spacing:.2em;color:var(--i);margin-top:9px}.directory-label{color:var(--muted);font-size:11px;letter-spacing:.18em;margin:38px 0 15px}.sidebar details{margin:7px 0}.sidebar summary{cursor:pointer;list-style:none;padding:10px 8px;color:var(--text);font-size:14px}.sidebar summary::-webkit-details-marker{display:none}.sidebar summary::before{content:'›';display:inline-block;color:var(--muted);margin-right:10px;transition:transform .15s}.sidebar details[open]>summary::before{transform:rotate(90deg)}.sidebar .subtree{margin-left:14px;border-left:1px solid var(--line);padding-left:10px}.sidebar .subtree summary{font-size:13px}.lesson-link{display:block;border-radius:6px;padding:11px 10px;margin:4px 0;text-decoration:none;font-size:12px;color:var(--muted);line-height:1.6}.lesson-link[aria-current=page]{color:var(--i);background:rgba(117,212,255,.09)}.lesson-link span{display:block;font-size:11px;color:var(--muted)}.empty-directory{font-size:12px;color:var(--muted);padding:4px 10px 10px;margin:0}.sidebar-foot{margin-top:auto;padding-top:36px;font-size:12px;color:var(--muted);line-height:1.9}.sidebar-foot a{color:var(--muted)}.page{width:100%;min-width:0;padding:30px 32px 24px}.top{flex-wrap:wrap}.breadcrumb{color:var(--muted);font-size:12px;line-height:1.8}.breadcrumb strong{color:var(--text);font-weight:400}.header-controls{display:flex;gap:9px;flex-wrap:wrap}.basis button{padding:9px 12px}.index-note{font-size:12px;color:var(--muted);margin-top:12px;padding-left:10px;border-left:2px solid var(--i);line-height:1.8}.menu-toggle{display:none;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:6px;padding:8px 11px}.menu-overlay{display:none}.intro{margin-top:28px}.code .allocation{color:var(--muted);font-size:11px}.sidebar-close{display:none}.footer span{line-height:1.8}
+@media(max-width:1150px){.workspace{grid-template-columns:1fr}.code-panel{margin-top:8px}.code{font-size:12px}.variables{margin-bottom:14px}.top{gap:14px}.intro{margin-bottom:22px}}
+@media(max-width:740px){.shell{display:block}.sidebar{position:fixed;left:0;top:0;width:250px;height:100dvh;z-index:10;transform:translateX(-100%);transition:transform .2s}.menu-open .sidebar{transform:translateX(0)}.menu-open .menu-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9}.sidebar-close{display:block;position:absolute;right:14px;top:16px;background:none;border:0;padding:10px;color:var(--muted);font-size:18px}.menu-toggle{display:inline-block}.page{padding:22px}.breadcrumb{flex:1}.header-controls{width:100%}.mode{flex:1;justify-content:center}.basis{flex:0}.top{gap:10px}}
+@media(max-width:400px){.page{padding:18px 14px}.header-controls{gap:6px}.mode button{padding:8px 10px}.breadcrumb{font-size:11px}.intro p{font-size:14px}.footer{gap:8px}}
 </style>
 </head>
 <body>
+<div class="shell">
+<div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+<aside class="sidebar" id="directory" aria-label="教程目录">
+  <button class="sidebar-close" id="menu-close" aria-label="关闭目录">×</button>
+  <a class="site-brand" href="#arrays/2d/transform-0">算法映像<small>ALGOVISTA</small></a>
+  <div class="directory-label">学习目录 / EXPLORE</div>
+  <nav aria-label="按算法分类">
+    <details open><summary>数组</summary><div class="subtree">
+      <details><summary>一维数组</summary><p class="empty-directory">暂无教程</p></details>
+      <details open><summary>二维数组</summary>
+        <a class="lesson-link" data-lesson="0" href="#arrays/2d/transform-0" aria-current="page">方块转换 · 0-base<span>P1205 · 从 0 开始</span></a>
+        <a class="lesson-link" data-lesson="1" href="#arrays/2d/transform-1">方块转换 · 1-base<span>P1205 · 从 1 开始</span></a>
+      </details>
+    </div></details>
+    <details><summary>搜索</summary><div class="subtree"><p class="empty-directory">暂无教程</p></div></details>
+    <details><summary>动态规划</summary><div class="subtree"><p class="empty-directory">暂无教程</p></div></details>
+  </nav>
+  <div class="sidebar-foot">让算法有画面，让代码有来路。<br><a href="https://github.com/TheSatchel/algorithm-learning-tutorials" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
+</aside>
 <main class="page">
-  <header class="top"><div class="brand"><span>◈</span> 看见下标 / MATRIX</div><div class="mode" aria-label="变换类型"><button data-mode="rotate" aria-pressed="true">顺时针 90°</button><button data-mode="mirror" aria-pressed="false">左右镜像</button></div></header>
+  <header class="top">
+    <button class="menu-toggle" id="menu-toggle" aria-controls="directory" aria-expanded="false">☰ 目录</button>
+    <div class="breadcrumb">数组 / 二维数组 / <strong>方块转换</strong></div>
+    <div class="header-controls">
+      <div class="mode basis" aria-label="下标起点"><button data-base="0" aria-pressed="true">0-base</button><button data-base="1" aria-pressed="false">1-base</button></div>
+      <div class="mode" aria-label="变换类型"><button data-mode="rotate" aria-pressed="true">顺时针 90°</button><button data-mode="mirror" aria-pressed="false">左右镜像</button></div>
+    </div>
+  </header>
   <section class="intro"><div class="eyebrow">P1205 · TRANSFORMATIONS</div><h1 id="heading">让一列，变成一行。</h1><p id="intro">先看图案怎样转，再看两个 for 怎样把这个动作写进数组。</p></section>
   <div class="workspace">
     <section class="theatre" aria-label="变换动画">
@@ -33,10 +63,12 @@
       <div class="code" id="code"></div>
       <div class="resolved" id="resolved"></div>
       <div class="trace" id="trace"></div>
+      <div class="index-note" id="index-note"></div>
     </aside>
   </div>
-  <footer class="footer"><span><span class="blue">蓝色 i</span> 选一列 / 一行，<span class="yellow">黄色 j</span> 决定这次抄哪一格。</span><span>下标从 0 开始 · <code>n = 3</code> · 格子只复制，不搬走</span></footer>
+  <footer class="footer"><span><span class="blue">蓝色 i</span> 选一列 / 一行，<span class="yellow">黄色 j</span> 决定这次抄哪一格。</span><span id="index-footer">下标从 0 开始 · n = 3 · 格子只复制，不搬走</span></footer>
 </main>
+</div>
 <script>
 (() => {
   'use strict';
@@ -45,6 +77,7 @@
   const original = ['A','B','C','D','E','F','G','H','I'];
   const colors = {text:'#e9edf3',muted:'#9aa8ba',line:'#354152',i:'#75d4ff',j:'#ffdb76',bg:'#101318'};
   let mode = 'rotate', view = 'geometry', done = 0, active = 0;
+  let base = location.hash === '#arrays/2d/transform-1' ? 1 : 0;
   let progress = 0, geometryDone = false, playing = false, busy = false, run = 0;
   let fly = null, width = 0, height = 0, layout = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -68,13 +101,22 @@
     if(letter)text(letter,x,y,colors.text,Math.min(24,s*.4));ctx.restore();
   }
   function grid(origin,type,values) {
+    if(base===1) {
+      ctx.save();ctx.setLineDash([3,4]);ctx.strokeStyle=colors.line;
+      for(let k=-1;k<3;k++) {
+        const p=point(origin,-1,k);ctx.strokeRect(p.x-layout.s*.44,p.y-layout.s*.44,layout.s*.88,layout.s*.88);text('·',p.x,p.y,colors.muted,14);
+        if(k>=0){const q=point(origin,k,-1);ctx.strokeRect(q.x-layout.s*.44,q.y-layout.s*.44,layout.s*.88,layout.s*.88);text('·',q.x,q.y,colors.muted,14);}
+      }
+      ctx.restore();
+    }
     for(let r=0;r<3;r++)for(let c=0;c<3;c++) {
       const p=point(origin,r,c);tile(p.x,p.y,values[r*3+c]);
     }
-    text(type,origin.x+layout.s*1.5,origin.y-47,colors.text,14);
+    text(type,origin.x+layout.s*(1.5-base/2),origin.y-base*layout.s-47,colors.text,14);
+    if(base===1){text('0',origin.x-layout.s/2,origin.y-layout.s-17,colors.muted,12);text('0',origin.x-layout.s-18,origin.y-layout.s/2,colors.muted,12);}
     for(let k=0;k<3;k++) {
-      text(k,origin.x+(k+.5)*layout.s,origin.y-17,colors.muted,12);
-      text(k,origin.x-18,origin.y+(k+.5)*layout.s,colors.muted,12);
+      text(k+base,origin.x+(k+.5)*layout.s,origin.y-base*layout.s-17,colors.muted,12);
+      text(k+base,origin.x-base*layout.s-18,origin.y+(k+.5)*layout.s,colors.muted,12);
     }
   }
   function arrow(x1,y1,x2,y2,color=colors.i) {
@@ -94,11 +136,11 @@
     }
     if(!busy) {
       text(geometryDone?'新图 b':'原图 a',cx,origin.y-44,colors.text,15);
-      for(let k=0;k<3;k++){text(k,origin.x+(k+.5)*s,origin.y-17,colors.muted,12);text(k,origin.x-19,origin.y+(k+.5)*s,colors.muted,12);}
+      for(let k=0;k<3;k++){text(k+base,origin.x+(k+.5)*s,origin.y-17,colors.muted,12);text(k+base,origin.x-19,origin.y+(k+.5)*s,colors.muted,12);}
       if(!geometryDone&&column)arrow(origin.x-35,origin.y+2.7*s,origin.x-35,origin.y+.3*s);
       if(geometryDone||!column)arrow(origin.x+.3*s,origin.y+3*s+24,origin.x+2.7*s,origin.y+3*s+24);
-      if(column&&!geometryDone)text('第 0 列 · 从下往上',cx,origin.y+3*s+54,colors.i,13);
-      else text(column?'第 0 行 · G → D → A':'第 0 行 · C → B → A',cx,origin.y+3*s+54,colors.i,13);
+      if(column&&!geometryDone)text(`第 ${base} 列 · 从下往上`,cx,origin.y+3*s+54,colors.i,13);
+      else text(`第 ${base} 行 · ${column?'G → D → A':geometryDone?'C → B → A':'A → B → C'}`,cx,origin.y+3*s+54,colors.i,13);
     }
   }
   function curve(a,b,t) {
@@ -119,8 +161,8 @@
     const src=point(layout.a,r,c),dst=point(layout.b,i,j);
     tile(src.x,src.y,original[r*3+c],'rgba(255,219,118,.15)');
     tile(dst.x,dst.y,output[active],'rgba(255,219,118,.12)');
-    text(mode==='rotate'?`列 i = ${i}`:`行 i = ${i}`,layout.a.x+1.5*s,layout.a.y+3*s+24,colors.i,13);
-    text(`行 i = ${i} · 列 j = ${j}`,layout.b.x+1.5*s,layout.b.y+3*s+24,colors.i,13);
+    text(mode==='rotate'?`列 i = ${i+base}`:`行 i = ${i+base}`,layout.a.x+(1.5-base/2)*s,layout.a.y+3*s+24,colors.i,13);
+    text(`行 i = ${i+base} · 列 j = ${j+base}`,layout.b.x+(1.5-base/2)*s,layout.b.y+3*s+24,colors.i,13);
     ctx.save();ctx.strokeStyle='rgba(255,219,118,.38)';ctx.lineWidth=1.5;ctx.setLineDash([4,6]);ctx.beginPath();
     for(let k=0;k<=50;k++){const p=curve(src,dst,k/50);if(k===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);}ctx.stroke();ctx.restore();
     if(fly){const p=curve(src,dst,ease(fly.t));tile(p.x,p.y,original[r*3+c],'#34404b');}
@@ -129,32 +171,40 @@
   function draw() {if(!layout)return;ctx.clearRect(0,0,width,height);view==='geometry'?geometry():loop();}
   function resize() {
     width=canvas.parentElement.clientWidth;
-    const stacked=width<480,s=Math.min(59,stacked?(width-64)/3:(width-105)/6);
-    height=view==='geometry'?350:(stacked?580:330);
+    const stacked=width<480,q=view==='loop'?3+base:3,s=Math.min(base&&view==='loop'?53:59,stacked?(width-64)/q:(width-105)/(q*2));
+    height=view==='geometry'?350:(stacked?(base?650:580):(base?380:330));
     const dpr=window.devicePixelRatio||1;canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);canvas.style.height=height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
-    layout={s,center:{x:width/2-1.5*s,y:64},a:stacked?{x:width/2-1.5*s,y:62}:{x:30,y:82},b:stacked?{x:width/2-1.5*s,y:340}:{x:width-3*s-12,y:82}};draw();
+    const left=stacked?width/2-q*s/2:30,right=stacked?left:width-q*s-12;
+    layout={s,center:{x:width/2-1.5*s,y:64},a:{x:left+base*s,y:(stacked?62:82)+base*s},b:{x:right+base*s,y:(stacked?(base?380:340):82)+base*s}};draw();
   }
   function ui() {
-    const {r,c,i,j}=sourceFor(active),letter=original[r*3+c];
+    const physical=sourceFor(active),letter=original[physical.r*3+physical.c];
+    const r=physical.r+base,c=physical.c+base,i=physical.i+base,j=physical.j+base;
     $('ival').textContent=i;$('jval').textContent=j;
-    const formula=mode==='rotate'?'a[<span class="yellow">n-1-j</span>][<span class="blue">i</span>]':'a[<span class="blue">i</span>][<span class="yellow">n-1-j</span>]';
-    $('code').innerHTML='<span class="dim">for (int </span><span class="blue">i</span><span class="dim"> = 0; i &lt; n; i++) {</span>\n  <span class="dim">for (int </span><span class="yellow">j</span><span class="dim"> = 0; j &lt; n; j++) {</span>\n    <span class="active">b[<span class="blue">i</span>][<span class="yellow">j</span>] = '+formula+';</span>\n  <span class="dim">}</span>\n<span class="dim">}</span>';
-    $('resolved').innerHTML=`<div class="small">n − 1 − j = 3 − 1 − ${j} = <span class="yellow">${2-j}</span></div>b[<span class="blue">${i}</span>][<span class="yellow">${j}</span>] ← a[${r}][${c}]<br><span class="small">本次取到：</span><span class="yellow">${letter}</span>`;
+    const reverse=base?'n+1-j':'n-1-j',op=base?'&lt;=':'&lt;';
+    const formula=mode==='rotate'?`a[<span class="yellow">${reverse}</span>][<span class="blue">i</span>]`:`a[<span class="blue">i</span>][<span class="yellow">${reverse}</span>]`;
+    $('code').innerHTML=`<span class="dim">for (int </span><span class="blue">i</span><span class="dim"> = ${base}; i ${op} n; i++) {</span>\n  <span class="dim">for (int </span><span class="yellow">j</span><span class="dim"> = ${base}; j ${op} n; j++) {</span>\n    <span class="active">b[<span class="blue">i</span>][<span class="yellow">j</span>] = ${formula};</span>\n  <span class="dim">}</span>\n<span class="dim">}</span>`;
+    $('resolved').innerHTML=`<div class="small">n ${base?'+':'−'} 1 − j = 3 ${base?'+':'−'} 1 − ${j} = <span class="yellow">${2+2*base-j}</span></div>b[<span class="blue">${i}</span>][<span class="yellow">${j}</span>] ← a[${r}][${c}]<br><span class="small">本次取到：</span><span class="yellow">${letter}</span>`;
+    $('index-note').innerHTML=base?'1-base：下标 1～n。开 <code>char a[4][4], b[4][4];</code>，灰色第 0 行 / 列留空，不参与循环。':'0-base：下标 0～n−1。开 <code>char a[3][3], b[3][3];</code>，每行、每列都参与循环。';
+    $('index-footer').textContent=`下标从 ${base} 开始 · n = 3 · 格子只复制，不搬走`;
+    document.title=`方块转换 · ${base}-base · 算法映像 AlgoVista`;
+    document.querySelectorAll('[data-base]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.base)===base)));
+    document.querySelectorAll('[data-lesson]').forEach(a=>{if(Number(a.dataset.lesson)===base)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
     $('heading').textContent=mode==='rotate'?'让一列，变成一行。':'让一行，左右倒过来。';
     $('step').textContent=view==='geometry'?'原图 → 新图':`已写入 ${done} / 9 格`;
     if(view==='geometry') {
-      $('caption').innerHTML=busy?(mode==='rotate'?'看蓝色这一列，怎样转成上面的一行。':'看这一行的左右两端，怎样交换位置。'):(geometryDone?'再点「看循环」，把这个动作拆成九次赋值。':(mode==='rotate'?'原图的第 0 列：<span class="blue">G ↑ D ↑ A</span>':'原图的第 0 行：<span class="blue">A → B → C</span>'));
+      $('caption').innerHTML=busy?(mode==='rotate'?'看蓝色这一列，怎样转成上面的一行。':'看这一行的左右两端，怎样交换位置。'):(geometryDone?'再点「看循环」，把这个动作拆成九次赋值。':(mode==='rotate'?`原图的第 ${base} 列：<span class="blue">G ↑ D ↑ A</span>`:`原图的第 ${base} 行：<span class="blue">A → B → C</span>`));
       $('trace').textContent=mode==='rotate'?'蓝色这一列从下往上读，得到 G、D、A。旋转后，它们就是新图的第一行。':'反射以中间的竖线为轴。每一行的左右次序反过来，行号保持不变。';
     } else {
       $('caption').innerHTML=done===9&&!busy?'九格填完，两个 for 执行结束。':`从 <span class="yellow">a[${r}][${c}]</span> 复制 ${letter}，写入 <span class="yellow">b[${i}][${j}]</span>`;
-      $('trace').innerHTML=`<span class="blue">i = ${i}</span>：${mode==='rotate'?`选原图第 ${i} 列，填新图第 ${i} 行。`:`原图和新图都选第 ${i} 行。`}<br><span class="yellow">j = ${j}</span>：新图向右，原图${mode==='rotate'?'向上':'向左'}。`+(j===2?'<br>这一行填完后：i 加 1，j 回到 0。':'');
+      $('trace').innerHTML=`<span class="blue">i = ${i}</span>：${mode==='rotate'?`选原图第 ${i} 列，填新图第 ${i} 行。`:`原图和新图都选第 ${i} 行。`}<br><span class="yellow">j = ${j}</span>：新图向右，原图${mode==='rotate'?'向上':'向左'}。`+(physical.j===2?(physical.i===2?'<br>最后一行填完，循环结束。':`<br>这一行填完后：i 加 1，j 回到 ${base}。`):'');
     }
     $('play').textContent=playing?'暂停':view==='geometry'?(busy?'继续播放':geometryDone?'再播一遍':mode==='rotate'?'播放旋转':'播放镜像'):(done===9?'从头播放':'自动执行');
     $('next').disabled=busy;$('next').textContent=view==='geometry'?'拆成循环':'下一格';
     $('reset').disabled=busy;
     document.querySelectorAll('[data-mode]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.mode===mode));b.disabled=busy;});
     document.querySelectorAll('[data-view]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.view===view));b.disabled=busy;});
-    document.body.dataset.done=done;document.body.dataset.busy=String(busy);document.body.dataset.active=active;
+    document.body.dataset.done=done;document.body.dataset.busy=String(busy);document.body.dataset.active=active;document.body.dataset.base=base;
   }
   async function animate(duration,frame,token) {
     if(reduced){frame(1);draw();return;}
@@ -179,7 +229,17 @@
     geometryDone=true;busy=false;playing=false;ui();draw();
   }
   function reset() {run++;playing=false;busy=false;done=0;active=0;fly=null;progress=0;geometryDone=false;ui();resize();}
-  function save(){try{localStorage.setItem('matrix-transform-learning',JSON.stringify({mode,view,done,active}));}catch{}}
+  function save(){try{localStorage.setItem('matrix-transform-learning',JSON.stringify({mode,view,base,done,active}));}catch{}}
+  function setMenu(open){document.body.classList.toggle('menu-open',open);$('menu-toggle').setAttribute('aria-expanded',String(open));$('directory').inert=matchMedia('(max-width: 740px)').matches&&!open;}
+  $('menu-toggle').addEventListener('click',()=>setMenu(!document.body.classList.contains('menu-open')));
+  $('menu-close').addEventListener('click',()=>{setMenu(false);$('menu-toggle').focus();});
+  $('menu-overlay').addEventListener('click',()=>setMenu(false));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){setMenu(false);if(matchMedia('(max-width: 740px)').matches)$('menu-toggle').focus();}});
+  document.querySelectorAll('[data-base]').forEach(b=>b.addEventListener('click',()=>{location.hash=`arrays/2d/transform-${b.dataset.base}`;}));
+  document.querySelectorAll('[data-lesson]').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
+  window.addEventListener('hashchange',()=>{base=location.hash==='#arrays/2d/transform-1'?1:0;reset();save();setMenu(false);});
+  matchMedia('(max-width: 740px)').addEventListener('change',()=>setMenu(false));
+  setMenu(false);
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;reset();save();}));
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;reset();save();}));
   $('play').addEventListener('click',()=>{

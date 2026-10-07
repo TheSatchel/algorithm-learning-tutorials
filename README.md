@@ -1,12 +1,14 @@
-# Algorithm Learning Tutorials
+# 算法映像 · AlgoVista
 
-Interactive algorithm tutorials that connect visual intuition, array indices, and C++ implementation.
+Interactive algorithm tutorials that connect visual intuition, array indices, and C++ implementation. Organized in a sidebar by topic and subtopic.
 
 **Live website:** https://thesatchel.github.io/algorithm-learning-tutorials/
 
 ## Current tutorial
 
 **Matrix transformations — Luogu P1205 / USACO Transformations**
+
+Located under **Arrays → Two-dimensional arrays**, with separate navigable **0-base** and **1-base** demonstrations. Index labels, formulas, loop bounds, and concrete array accesses update together. The 1-base demo shows the unused row and column at index 0.
 
 - Animated clockwise rotation and horizontal reflection.
 - Step-by-step copying from the original matrix into the destination matrix.
