@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="通过交互动画理解矩阵旋转、镜像、数组下标和 C++ 双重循环。">
+<title>看见下标 · 方块转换</title>
+<style>
+:root{color-scheme:dark;--bg:#101318;--panel:#171d25;--line:#29323f;--text:#e9edf3;--muted:#a2adbd;--i:#75d4ff;--j:#ffdb76;--green:#90e1b1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"PingFang SC",sans-serif}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:2px solid var(--i);outline-offset:4px}button:disabled{cursor:default;opacity:.4}
+.page{max-width:1240px;margin:auto;padding:32px 40px 24px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-size:13px;letter-spacing:.15em;color:var(--muted)}.brand span{color:var(--i)}.mode{display:flex;gap:4px;background:var(--panel);padding:5px;border-radius:10px}.mode button{border:0;background:transparent;color:var(--muted);padding:9px 17px;border-radius:6px}.mode button[aria-pressed=true]{background:#303a47;color:var(--text)}
+.intro{margin:38px 0 28px}.eyebrow{font-size:12px;letter-spacing:.18em;color:var(--muted)}h1{font-size:clamp(27px,4vw,44px);font-weight:500;margin:10px 0 12px;letter-spacing:-.04em}.intro p{color:var(--muted);font-size:15px;margin:0;line-height:1.7}.blue{color:var(--i)}.yellow{color:var(--j)}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:28px;align-items:start}.theatre{min-width:0}.scene-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:15px}.chapters{display:flex;gap:20px}.chapters button{color:var(--muted);background:none;border:none;padding:0 0 5px;font-size:14px}.chapters button[aria-pressed=true]{color:var(--text)}.chapters b{font-weight:400;color:var(--i);margin-right:7px}.step{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.canvas-wrap{position:relative;margin-top:12px}canvas{display:block;width:100%}.caption{min-height:58px;display:flex;align-items:center;justify-content:center;gap:12px;text-align:center;font-size:15px;line-height:1.6}.caption .subtle{color:var(--muted)}
+.controls{border-top:1px solid var(--line);padding-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.controls button{border:1px solid #354152;border-radius:7px;background:transparent;color:var(--text);padding:10px 14px}.controls .primary{background:var(--text);color:var(--bg);border-color:var(--text);min-width:100px}.speed{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.speed select{background:var(--bg);color:var(--text);border:1px solid var(--line);padding:7px;border-radius:6px}
+.code-panel{padding:23px 22px;background:var(--panel);border:1px solid var(--line);border-radius:12px}.code-label{font-size:12px;letter-spacing:.1em;color:var(--muted);margin-bottom:20px}.variables{display:flex;gap:18px;margin-bottom:24px}.variable{font-family:ui-monospace,SFMono-Regular,monospace;font-size:23px}.variable small{font-size:12px;color:var(--muted);display:block;margin-top:5px;font-family:system-ui}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:2.15;white-space:pre-wrap;overflow-wrap:anywhere}.code .dim{color:#8795a8}.code .active{background:#243240;border-radius:4px;display:inline-block;padding:0 5px;margin:0 -5px}.resolved{padding-top:18px;margin-top:18px;border-top:1px solid var(--line);font-family:ui-monospace,SFMono-Regular,monospace;font-size:15px;line-height:1.8}.resolved .small{font-size:12px;color:var(--muted)}.trace{margin-top:18px;color:var(--muted);font-size:13px;line-height:1.8;min-height:70px}.footer{display:flex;justify-content:space-between;gap:16px;margin-top:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}.footer code{color:var(--text)}
+@media(max-width:950px){.page{padding:24px}.workspace{grid-template-columns:minmax(0,1fr) 290px;gap:18px}.code-panel{padding:20px 16px}.code{font-size:11px}}@media(max-width:740px){.workspace{grid-template-columns:1fr}.intro{margin-top:26px}.code-panel{margin-top:4px}.footer{flex-direction:column}.speed{margin-left:0}}@media(max-width:400px){.page{padding:18px 14px}.top{align-items:flex-start;gap:10px}.brand{font-size:11px}.mode button{padding:7px 10px;font-size:12px}.chapters{gap:12px}.chapters button{font-size:13px}.controls button{padding:9px 10px}.caption{font-size:13px}.step{font-size:11px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="top"><div class="brand"><span>◈</span> 看见下标 / MATRIX</div><div class="mode" aria-label="变换类型"><button data-mode="rotate" aria-pressed="true">顺时针 90°</button><button data-mode="mirror" aria-pressed="false">左右镜像</button></div></header>
+  <section class="intro"><div class="eyebrow">P1205 · TRANSFORMATIONS</div><h1 id="heading">让一列，变成一行。</h1><p id="intro">先看图案怎样转，再看两个 for 怎样把这个动作写进数组。</p></section>
+  <div class="workspace">
+    <section class="theatre" aria-label="变换动画">
+      <div class="scene-head"><div class="chapters"><button data-view="geometry" aria-pressed="true"><b>01</b>看整体</button><button data-view="loop" aria-pressed="false"><b>02</b>看循环</button></div><span class="step" id="step">原图 → 新图</span></div>
+      <div class="canvas-wrap"><canvas id="scene" role="img" aria-label="3×3 字母矩阵的旋转与下标动画"></canvas></div>
+      <div class="caption" id="caption" aria-live="polite"></div>
+      <div class="controls"><button id="play" class="primary">播放旋转</button><button id="next">下一格</button><button id="reset">重新看</button><label class="speed">速度<select id="speed"><option value="1.8">慢一点</option><option value="1" selected>正常</option><option value="0.6">快一点</option></select></label></div>
+    </section>
+    <aside class="code-panel" aria-label="当前循环与下标">
+      <div class="code-label">同一个动作，在代码里</div>
+      <div class="variables"><div class="variable blue">i = <span id="ival">0</span><small>新图的行</small></div><div class="variable yellow">j = <span id="jval">0</span><small>新图的列</small></div></div>
+      <div class="code" id="code"></div>
+      <div class="resolved" id="resolved"></div>
+      <div class="trace" id="trace"></div>
+    </aside>
+  </div>
+  <footer class="footer"><span><span class="blue">蓝色 i</span> 选一列 / 一行，<span class="yellow">黄色 j</span> 决定这次抄哪一格。</span><span>下标从 0 开始 · <code>n = 3</code> · 格子只复制，不搬走</span></footer>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const canvas = $('scene'), ctx = canvas.getContext('2d');
+  const original = ['A','B','C','D','E','F','G','H','I'];
+  const colors = {text:'#e9edf3',muted:'#9aa8ba',line:'#354152',i:'#75d4ff',j:'#ffdb76',bg:'#101318'};
+  let mode = 'rotate', view = 'geometry', done = 0, active = 0;
+  let progress = 0, geometryDone = false, playing = false, busy = false, run = 0;
+  let fly = null, width = 0, height = 0, layout = null;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sourceFor = k => {
+    const i = Math.floor(k / 3), j = k % 3;
+    return mode === 'rotate' ? {r:2-j,c:i,i,j} : {r:i,c:2-j,i,j};
+  };
+  const ease = t => t*t*(3-2*t);
+  const lerp = (a,b,t) => a+(b-a)*t;
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  function point(origin,r,c) {return {x:origin.x+(c+.5)*layout.s,y:origin.y+(r+.5)*layout.s};}
+  function text(t,x,y,color=colors.text,size=14,align='center') {
+    ctx.fillStyle=color; ctx.font=`${size}px ui-monospace, SFMono-Regular, monospace`;
+    ctx.textAlign=align; ctx.textBaseline='middle'; ctx.fillText(t,x,y);
+  }
+  function tile(x,y,letter,fill=null,alpha=1) {
+    const s=layout.s; ctx.save();ctx.globalAlpha=alpha;
+    if(fill){ctx.fillStyle=fill;ctx.fillRect(x-s*.44,y-s*.44,s*.88,s*.88);}
+    ctx.strokeStyle=fill?(fill.startsWith('rgba(117')?colors.i:colors.j):colors.line;ctx.lineWidth=fill?1.8:1;
+    ctx.strokeRect(x-s*.44,y-s*.44,s*.88,s*.88);
+    if(letter)text(letter,x,y,colors.text,Math.min(24,s*.4));ctx.restore();
+  }
+  function grid(origin,type,values) {
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++) {
+      const p=point(origin,r,c);tile(p.x,p.y,values[r*3+c]);
+    }
+    text(type,origin.x+layout.s*1.5,origin.y-47,colors.text,14);
+    for(let k=0;k<3;k++) {
+      text(k,origin.x+(k+.5)*layout.s,origin.y-17,colors.muted,12);
+      text(k,origin.x-18,origin.y+(k+.5)*layout.s,colors.muted,12);
+    }
+  }
+  function arrow(x1,y1,x2,y2,color=colors.i) {
+    ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(a-.4),y2-9*Math.sin(a-.4));ctx.lineTo(x2-9*Math.cos(a+.4),y2-9*Math.sin(a+.4));ctx.fill();
+  }
+  function geometry() {
+    const s=layout.s, origin=layout.center, cx=origin.x+1.5*s,cy=origin.y+1.5*s;
+    const p=progress,angle=p*Math.PI/2;
+    const column=mode==='rotate';
+    for(let k=0;k<9;k++) {
+      const r=Math.floor(k/3),c=k%3,dx=(c-1)*s,dy=(r-1)*s;
+      const x=column?cx+dx*Math.cos(angle)-dy*Math.sin(angle):cx+dx*Math.cos(p*Math.PI);
+      const y=column?cy+dx*Math.sin(angle)+dy*Math.cos(angle):cy+dy;
+      const hot=column?c===0:r===0;
+      tile(x,y,original[k],hot?'rgba(117,212,255,.12)':null);
+    }
+    if(!busy) {
+      text(geometryDone?'新图 b':'原图 a',cx,origin.y-44,colors.text,15);
+      for(let k=0;k<3;k++){text(k,origin.x+(k+.5)*s,origin.y-17,colors.muted,12);text(k,origin.x-19,origin.y+(k+.5)*s,colors.muted,12);}
+      if(!geometryDone&&column)arrow(origin.x-35,origin.y+2.7*s,origin.x-35,origin.y+.3*s);
+      if(geometryDone||!column)arrow(origin.x+.3*s,origin.y+3*s+24,origin.x+2.7*s,origin.y+3*s+24);
+      if(column&&!geometryDone)text('第 0 列 · 从下往上',cx,origin.y+3*s+54,colors.i,13);
+      else text(column?'第 0 行 · G → D → A':'第 0 行 · C → B → A',cx,origin.y+3*s+54,colors.i,13);
+    }
+  }
+  function curve(a,b,t) {
+    const narrow=width<480, bend=narrow?40:-55;
+    const c1={x:lerp(a.x,b.x,.35)+(narrow?bend:0),y:lerp(a.y,b.y,.25)+(narrow?0:bend)};
+    const c2={x:lerp(a.x,b.x,.7)+(narrow?bend:0),y:lerp(a.y,b.y,.7)+(narrow?0:bend)};
+    const q=1-t;
+    return {x:q*q*q*a.x+3*q*q*t*c1.x+3*q*t*t*c2.x+t*t*t*b.x,y:q*q*q*a.y+3*q*q*t*c1.y+3*q*t*t*c2.y+t*t*t*b.y};
+  }
+  function loop() {
+    const {r,c,i,j}=sourceFor(active),s=layout.s;
+    const output=Array(9).fill('');for(let k=0;k<done;k++){const a=sourceFor(k);output[k]=original[a.r*3+a.c];}
+    ctx.fillStyle='rgba(117,212,255,.07)';
+    if(mode==='rotate')ctx.fillRect(layout.a.x+c*s-3,layout.a.y-3,s+6,3*s+6);
+    else ctx.fillRect(layout.a.x-3,layout.a.y+r*s-3,3*s+6,s+6);
+    ctx.fillRect(layout.b.x-3,layout.b.y+i*s-3,3*s+6,s+6);
+    grid(layout.a,'原图 a · 取值',original);grid(layout.b,'新图 b · 按行填',output);
+    const src=point(layout.a,r,c),dst=point(layout.b,i,j);
+    tile(src.x,src.y,original[r*3+c],'rgba(255,219,118,.15)');
+    tile(dst.x,dst.y,output[active],'rgba(255,219,118,.12)');
+    text(mode==='rotate'?`列 i = ${i}`:`行 i = ${i}`,layout.a.x+1.5*s,layout.a.y+3*s+24,colors.i,13);
+    text(`行 i = ${i} · 列 j = ${j}`,layout.b.x+1.5*s,layout.b.y+3*s+24,colors.i,13);
+    ctx.save();ctx.strokeStyle='rgba(255,219,118,.38)';ctx.lineWidth=1.5;ctx.setLineDash([4,6]);ctx.beginPath();
+    for(let k=0;k<=50;k++){const p=curve(src,dst,k/50);if(k===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);}ctx.stroke();ctx.restore();
+    if(fly){const p=curve(src,dst,ease(fly.t));tile(p.x,p.y,original[r*3+c],'#34404b');}
+    if(width>=480)text('复制',width/2,height-25,colors.muted,12);
+  }
+  function draw() {if(!layout)return;ctx.clearRect(0,0,width,height);view==='geometry'?geometry():loop();}
+  function resize() {
+    width=canvas.parentElement.clientWidth;
+    const stacked=width<480,s=Math.min(59,stacked?(width-64)/3:(width-105)/6);
+    height=view==='geometry'?350:(stacked?580:330);
+    const dpr=window.devicePixelRatio||1;canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);canvas.style.height=height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
+    layout={s,center:{x:width/2-1.5*s,y:64},a:stacked?{x:width/2-1.5*s,y:62}:{x:30,y:82},b:stacked?{x:width/2-1.5*s,y:340}:{x:width-3*s-12,y:82}};draw();
+  }
+  function ui() {
+    const {r,c,i,j}=sourceFor(active),letter=original[r*3+c];
+    $('ival').textContent=i;$('jval').textContent=j;
+    const formula=mode==='rotate'?'a[<span class="yellow">n-1-j</span>][<span class="blue">i</span>]':'a[<span class="blue">i</span>][<span class="yellow">n-1-j</span>]';
+    $('code').innerHTML='<span class="dim">for (int </span><span class="blue">i</span><span class="dim"> = 0; i &lt; n; i++) {</span>\n  <span class="dim">for (int </span><span class="yellow">j</span><span class="dim"> = 0; j &lt; n; j++) {</span>\n    <span class="active">b[<span class="blue">i</span>][<span class="yellow">j</span>] = '+formula+';</span>\n  <span class="dim">}</span>\n<span class="dim">}</span>';
+    $('resolved').innerHTML=`<div class="small">n − 1 − j = 3 − 1 − ${j} = <span class="yellow">${2-j}</span></div>b[<span class="blue">${i}</span>][<span class="yellow">${j}</span>] ← a[${r}][${c}]<br><span class="small">本次取到：</span><span class="yellow">${letter}</span>`;
+    $('heading').textContent=mode==='rotate'?'让一列，变成一行。':'让一行，左右倒过来。';
+    $('step').textContent=view==='geometry'?'原图 → 新图':`已写入 ${done} / 9 格`;
+    if(view==='geometry') {
+      $('caption').innerHTML=busy?(mode==='rotate'?'看蓝色这一列，怎样转成上面的一行。':'看这一行的左右两端，怎样交换位置。'):(geometryDone?'再点「看循环」，把这个动作拆成九次赋值。':(mode==='rotate'?'原图的第 0 列：<span class="blue">G ↑ D ↑ A</span>':'原图的第 0 行：<span class="blue">A → B → C</span>'));
+      $('trace').textContent=mode==='rotate'?'蓝色这一列从下往上读，得到 G、D、A。旋转后，它们就是新图的第一行。':'反射以中间的竖线为轴。每一行的左右次序反过来，行号保持不变。';
+    } else {
+      $('caption').innerHTML=done===9&&!busy?'九格填完，两个 for 执行结束。':`从 <span class="yellow">a[${r}][${c}]</span> 复制 ${letter}，写入 <span class="yellow">b[${i}][${j}]</span>`;
+      $('trace').innerHTML=`<span class="blue">i = ${i}</span>：${mode==='rotate'?`选原图第 ${i} 列，填新图第 ${i} 行。`:`原图和新图都选第 ${i} 行。`}<br><span class="yellow">j = ${j}</span>：新图向右，原图${mode==='rotate'?'向上':'向左'}。`+(j===2?'<br>这一行填完后：i 加 1，j 回到 0。':'');
+    }
+    $('play').textContent=playing?'暂停':view==='geometry'?(busy?'继续播放':geometryDone?'再播一遍':mode==='rotate'?'播放旋转':'播放镜像'):(done===9?'从头播放':'自动执行');
+    $('next').disabled=busy;$('next').textContent=view==='geometry'?'拆成循环':'下一格';
+    $('reset').disabled=busy;
+    document.querySelectorAll('[data-mode]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.mode===mode));b.disabled=busy;});
+    document.querySelectorAll('[data-view]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.view===view));b.disabled=busy;});
+    document.body.dataset.done=done;document.body.dataset.busy=String(busy);document.body.dataset.active=active;
+  }
+  async function animate(duration,frame,token) {
+    if(reduced){frame(1);draw();return;}
+    await new Promise(resolve=>{let last=null,elapsed=0;function tick(now){if(token!==run){resolve();return;}if(last===null)last=now;if(view!=='geometry'||playing)elapsed+=now-last;last=now;const p=Math.min(1,elapsed/duration);frame(p);draw();if(p<1)requestAnimationFrame(tick);else resolve();}requestAnimationFrame(tick);});
+  }
+  async function execute() {
+    if(busy||done>=9)return;
+    const token=run;active=done;busy=true;fly={t:0};ui();draw();
+    await animate(1050*Number($('speed').value),p=>{fly.t=p;},token);
+    if(token!==run)return;
+    done++;fly=null;busy=false;ui();draw();save();
+  }
+  async function autoLoop() {
+    const token=run;
+    while(playing&&done<9&&token===run){await execute();if(token!==run)return;await wait(380*Number($('speed').value));}
+    if(token===run){playing=false;ui();}
+  }
+  async function animateGeometry() {
+    const token=run;playing=true;busy=true;geometryDone=false;progress=0;ui();
+    await animate(2400*Number($('speed').value),p=>{progress=ease(p);},token);
+    if(token!==run)return;
+    geometryDone=true;busy=false;playing=false;ui();draw();
+  }
+  function reset() {run++;playing=false;busy=false;done=0;active=0;fly=null;progress=0;geometryDone=false;ui();resize();}
+  function save(){try{localStorage.setItem('matrix-transform-learning',JSON.stringify({mode,view,done,active}));}catch{}}
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;reset();save();}));
+  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;reset();save();}));
+  $('play').addEventListener('click',()=>{
+    if(view==='geometry'){if(busy){playing=!playing;ui();return;}animateGeometry();return;}
+    if(playing){playing=false;ui();return;}
+    if(busy)return;if(done===9)reset();playing=true;ui();autoLoop();
+  });
+  $('next').addEventListener('click',()=>{playing=false;if(view==='geometry'){view='loop';reset();save();return;}if(done===9)reset();execute();});
+  $('reset').addEventListener('click',()=>{reset();save();});
+  new ResizeObserver(resize).observe(canvas.parentElement);
+  ui();resize();
+})();
+</script>
+</body>
+</html>
